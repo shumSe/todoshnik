@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/back_primary"
+    android:isScrollContainer="true"
+    android:orientation="vertical"
+    tools:context=".presentation.fragments.todoInfoFragment.TodoInfoFragment"
+
+    >
+
+    <androidx.appcompat.widget.Toolbar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/green"
+
+        />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="16dp"
+
+        >
+
+        <EditText
+            android:id="@+id/et_todo_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@color/back_secondary"
+            android:gravity="top|start"
+            android:inputType="textMultiLine"
+            android:minHeight="100dp"
+            android:padding="16dp"
+            android:text="ABOBA"
+            android:textAppearance="@style/Body"
+
+            />
+
+        <TextView
+            android:id="@+id/tv_importance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/importance"
+            android:textAppearance="@style/Body"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_todo_text" />
+
+        <Spinner
+            android:id="@+id/spinner_importance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:background="@color/back_primary"
+            android:tooltipText="text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_importance" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</LinearLayout>
