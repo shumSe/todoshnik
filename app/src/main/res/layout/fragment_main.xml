@@ -23,7 +23,7 @@
             android:layout_height="match_parent"
             app:expandedTitleMarginEnd="64dp"
             app:expandedTitleMarginStart="48dp"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"
             app:expandedTitleMarginBottom="50dp"
             android:background="@color/back_primary"
             >
@@ -49,11 +49,11 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
+                android:layout_gravity="bottom|end|center"
                 android:layout_marginEnd="10dp"
                 android:src="@drawable/visibility"
                 android:background="@color/back_primary"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="17dp"
                 />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -67,6 +67,7 @@
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         android:background="@color/back_secondary"
+
         >
     </androidx.recyclerview.widget.RecyclerView>
 

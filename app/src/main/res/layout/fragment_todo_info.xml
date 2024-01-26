@@ -1,67 +1,168 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/back_primary"
-    android:isScrollContainer="true"
-    android:orientation="vertical"
-    tools:context=".presentation.fragments.todoInfoFragment.TodoInfoFragment"
+    tools:context=".presentation.fragments.todoInfoFragment.TodoInfoFragment">
 
-    >
-
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/green"
+        android:layout_height="wrap_content">
 
-        />
-
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingHorizontal="16dp"
-
-        >
-
-        <EditText
-            android:id="@+id/et_todo_text"
+        <androidx.appcompat.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:background="@color/back_secondary"
-            android:gravity="top|start"
-            android:inputType="textMultiLine"
-            android:minHeight="100dp"
-            android:padding="16dp"
-            android:text="ABOBA"
-            android:textAppearance="@style/Body"
-
-            />
-
-        <TextView
-            android:id="@+id/tv_importance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/importance"
-            android:textAppearance="@style/Body"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/et_todo_text" />
-
-        <Spinner
-            android:id="@+id/spinner_importance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
             android:background="@color/back_primary"
-            android:tooltipText="text"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_importance" />
+            android:minHeight="?actionBarSize"
+            >
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/close"/>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <Button
+                android:id="@+id/btn_save_todo"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginEnd="4dp"
+                android:background="@color/back_primary"
+                android:backgroundTint="@color/back_primary"
+                android:text="@string/save"
+                android:textAllCaps="true"
+                android:textAppearance="@style/Body"
+                android:textColor="@color/blue" />
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
 
-</LinearLayout>
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+
+            >
+
+            <EditText
+                android:id="@+id/et_todo_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/back_secondary"
+                android:gravity="top|start"
+                android:inputType="textMultiLine"
+                android:minHeight="100dp"
+                android:padding="16dp"
+                android:textAppearance="@style/Body"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_importance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="24dp"
+                android:text="@string/importance"
+                android:textAppearance="@style/Body"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_todo_text" />
+
+            <Spinner
+                android:id="@+id/spinner_importance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="4dp"
+                android:background="@color/back_primary"
+                android:tooltipText="text"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_importance"
+
+                />
+
+            <View
+                android:id="@+id/spinner_divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintTop_toBottomOf="@id/spinner_importance" />
+
+            <TextView
+                android:id="@+id/tv_do_until"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/do_until"
+                android:textAppearance="@style/Body"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/spinner_divider" />
+
+            <TextView
+                android:id="@+id/tv_info_deadline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginTop="4dp"
+                android:visibility="visible"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_do_until" />
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/switch_deadline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                app:layout_constraintBottom_toBottomOf="@id/tv_info_deadline"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/tv_do_until" />
+
+            <Space
+                android:id="@+id/space_deadline"
+                android:layout_width="match_parent"
+                android:layout_height="24dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintBottom_toTopOf="@id/delete_divider"
+                app:layout_constraintTop_toBottomOf="@id/tv_info_deadline" />
+
+            <View
+                android:id="@+id/delete_divider"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider"
+                app:layout_constraintTop_toBottomOf="@id/space_deadline" />
+
+            <Button
+                style="@style/Widget.Material3.Button.TextButton.Icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="50dp"
+                android:background="@color/back_primary"
+                android:text="@string/delete"
+                android:textAppearance="@style/Body"
+                android:textColor="@color/red"
+                app:icon="@drawable/delete"
+                app:iconSize="24dp"
+                app:iconTint="@color/red"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+
+                app:layout_constraintTop_toBottomOf="@id/delete_divider" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.core.widget.NestedScrollView>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

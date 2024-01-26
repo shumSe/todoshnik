@@ -1,5 +1,5 @@
 package ru.shumikhin.todoshnik.utils
 
-enum class Importance {
-    LOW, STANDART, HIGH
+enum class Importance() {
+    BASIC, LOW, IMPORTANT
 }

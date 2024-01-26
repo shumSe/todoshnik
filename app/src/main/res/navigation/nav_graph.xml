@@ -18,5 +18,14 @@
         android:id="@+id/todoInfoFragment"
         android:name="ru.shumikhin.todoshnik.presentation.fragments.todoInfoFragment.TodoInfoFragment"
         android:label="fragment_todo_info"
-        tools:layout="@layout/fragment_todo_info" />
+        tools:layout="@layout/fragment_todo_info" >
+        <action
+            android:id="@+id/action_todoInfoFragment_to_mainFragment"
+            app:popUpTo="@id/mainFragment" />
+        <argument
+            android:name="todo_id"
+            app:argType="string"
+            app:nullable="true"
+            android:defaultValue="null" />
+    </fragment>
 </navigation>

@@ -6,14 +6,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.os.bundleOf
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import ru.shumikhin.todoshnik.R
+import ru.shumikhin.todoshnik.TodoApplication
 import ru.shumikhin.todoshnik.data.storage.localstorage.TodoLocalStorageImpl
 import ru.shumikhin.todoshnik.data.repository.TodoItemRepositoryImpl
 import ru.shumikhin.todoshnik.databinding.FragmentMainBinding
 import ru.shumikhin.todoshnik.domain.useCase.GetTodoListUseCase
 import ru.shumikhin.todoshnik.presentation.fragments.mainFragment.adapter.TodoAdapter
+import ru.shumikhin.todoshnik.presentation.fragments.todoInfoFragment.TodoInfoFragment
 
 
 class MainFragment : Fragment(), TodoAdapter.TodoRecyclerEvent {
@@ -21,13 +25,14 @@ class MainFragment : Fragment(), TodoAdapter.TodoRecyclerEvent {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
 
-    private val todoLocalStorage = TodoLocalStorageImpl()
-    private val todoItemRepository = TodoItemRepositoryImpl(
-        todoLocalStorage = todoLocalStorage
-    )
-    private val getListUseCase = GetTodoListUseCase(todoItemRepository = todoItemRepository)
 
-    private val dataList = getListUseCase.execute()
+    private val todoItemRepository by lazy{
+        (requireActivity().application as TodoApplication).repository
+    }
+
+    private val getListUseCase by lazy {  GetTodoListUseCase(todoItemRepository = todoItemRepository) }
+
+    private val dataList by lazy { getListUseCase.execute() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,6 +63,8 @@ class MainFragment : Fragment(), TodoAdapter.TodoRecyclerEvent {
 
     override fun onItemClick(position: Int) {
         val todo = dataList[position]
-        Toast.makeText(requireContext(), todo.text, Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), todo.importance.toString(), Toast.LENGTH_SHORT).show()
+        val bundle = bundleOf("todo_id" to todo.id.toString())
+        findNavController().navigate(R.id.action_mainFragment_to_todoInfoFragment, bundle)
     }
 }
