@@ -2,8 +2,19 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.Todoshnik" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+         <item name="colorPrimary">@color/back_primary</item>
+        <item name="android:colorPrimaryDark">@color/back_primary</item>
+        <item name="android:textColorPrimary">@color/label_primary</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="Theme.Todoshnik" parent="Base.Theme.Todoshnik" />
+
+    <style name="ToolbarTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:textColorPrimary">@color/blue</item>
+        <item name="android:colorPressedHighlight">@color/back_primary</item>
+        <item name="android:colorLongPressedHighlight">@color/back_primary</item>
+        <item name="selectableItemBackground">?android:selectableItemBackground</item>
+        <item name="selectableItemBackgroundBorderless">?android:selectableItemBackground</item>
+    </style>`
 </resources>

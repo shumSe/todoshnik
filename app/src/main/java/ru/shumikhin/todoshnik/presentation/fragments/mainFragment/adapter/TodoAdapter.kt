@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import ru.shumikhin.todoshnik.databinding.TodoListItemBinding
 import ru.shumikhin.todoshnik.domain.model.TodoItem
-import ru.shumikhin.todoshnik.utils.DateFormatter
+import ru.shumikhin.todoshnik.utils.DateConverter
 
 class TodoAdapter(
     private  val listener: TodoRecyclerEvent
@@ -18,7 +18,7 @@ class TodoAdapter(
             notifyDataSetChanged()
         }
 
-    private val dateFormatter = DateFormatter()
+    private val dateConverter = DateConverter()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -36,7 +36,7 @@ class TodoAdapter(
                 tvTodoDeadline.visibility = View.GONE
             } else {
                 tvTodoDeadline.visibility = View.VISIBLE
-                tvTodoDeadline.text = dateFormatter.dateToString(todo.deadline!!)
+                tvTodoDeadline.text = dateConverter.dateToString(todo.deadline!!)
             }
             checkboxIsCompleted.isChecked = todo.isCompleted
         }

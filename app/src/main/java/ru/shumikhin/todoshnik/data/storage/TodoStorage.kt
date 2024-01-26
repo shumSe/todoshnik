@@ -8,6 +8,6 @@ interface TodoStorage {
 
     fun addTodo(todo: TodoItemStorage)
 
-    fun getTodo(): TodoItemStorage
+    fun getTodo(id: String): TodoItemStorage
 
 }

@@ -14,4 +14,21 @@ Faucibus et molestie ac feugiat sed lectus vestibulum. Mattis nunc sed blandit l
     <string name="my_tasks">Мои дела</string>
     <string name="completed">Выполнено -</string>
     <string name="importance">Важность</string>
+    <string name="do_until">Сделать до</string>
+    <string name="delete">Удалить</string>
+    <string name="save">Сохранить</string>
+
+
+    <string-array name="importance_entries">
+        <item>Нет</item>
+        <item>Низкий</item>
+        <item>Высокий</item>
+    </string-array>
+
+    <string-array name="importance_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
 </resources>
