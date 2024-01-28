@@ -44,8 +44,15 @@ class TodoAdapter(
 
     inner class TodoViewHolder(val binding : TodoListItemBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
         init {
-            binding.tvTodoTitle.setOnClickListener(this)
             binding.btnTodoInfo.setOnClickListener(this)
+            binding.root.setOnClickListener(this)
+
+            binding.checkboxIsCompleted.setOnClickListener{
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION){
+                    listener.onCheckBoxClick(position, binding.checkboxIsCompleted.isChecked)
+                }
+            }
         }
         override fun onClick(p0: View?) {
             val position = adapterPosition
@@ -57,5 +64,7 @@ class TodoAdapter(
 
     interface TodoRecyclerEvent{
         fun onItemClick(position: Int)
+
+        fun onCheckBoxClick(position: Int, isChecked: Boolean)
     }
 }

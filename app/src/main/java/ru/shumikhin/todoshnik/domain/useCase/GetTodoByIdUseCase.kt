@@ -5,7 +5,7 @@ import ru.shumikhin.todoshnik.domain.repository.TodoItemRepository
 
 class GetTodoByIdUseCase(private val todoItemRepository: TodoItemRepository) {
 
-    fun execute(id: String):TodoItem{
+    suspend fun execute(id: String):TodoItem{
         return todoItemRepository.getTodo(id)
     }
 }

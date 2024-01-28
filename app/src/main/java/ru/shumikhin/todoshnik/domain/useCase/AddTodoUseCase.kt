@@ -5,7 +5,7 @@ import ru.shumikhin.todoshnik.domain.repository.TodoItemRepository
 
 class AddTodoUseCase(private val todoItemRepository: TodoItemRepository) {
 
-    fun execute(todo: TodoItem){
+    suspend fun execute(todo: TodoItem){
         todoItemRepository.addTodo(todo)
     }
 }

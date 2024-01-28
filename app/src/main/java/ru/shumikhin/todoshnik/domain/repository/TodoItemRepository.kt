@@ -8,8 +8,10 @@ interface TodoItemRepository {
 
     fun getTodoList(): Flow<List<TodoItem>>
 
-    fun addTodo(todo: TodoItem)
+    suspend fun addTodo(todo: TodoItem)
 
-    fun getTodo(id: String): TodoItem
+    suspend fun getTodo(id: String): TodoItem
+
+    suspend fun updateTodo(todo: TodoItem)
 
 }

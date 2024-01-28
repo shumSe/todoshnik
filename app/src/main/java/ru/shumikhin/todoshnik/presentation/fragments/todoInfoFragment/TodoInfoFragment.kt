@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import ru.shumikhin.todoshnik.R
 import ru.shumikhin.todoshnik.TodoApplication
 import ru.shumikhin.todoshnik.databinding.FragmentTodoInfoBinding
@@ -29,6 +30,8 @@ class TodoInfoFragment : Fragment() {
     private val todoItemRepository by lazy{
         (requireActivity().application as TodoApplication).repository
     }
+
+    private val args: TodoInfoFragmentArgs by navArgs()
 
     private val addTodoUseCase by lazy {  AddTodoUseCase(todoItemRepository = todoItemRepository) }
 
@@ -58,7 +61,7 @@ class TodoInfoFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.btnSaveTodo.setOnClickListener {
             val todo = buildTodo()
-            addTodoUseCase.execute(todo)
+//            addTodoUseCase.execute(todo)
             Toast.makeText(requireContext(), "TODO ADDED", Toast.LENGTH_SHORT).show()
             findNavController().navigate(R.id.action_todoInfoFragment_to_mainFragment)
         }
@@ -91,8 +94,8 @@ class TodoInfoFragment : Fragment() {
     }
 
     private fun setViewsData(id: String){
-        val todo = getTodoByIdUseCase.execute(id)
-        binding.etTodoText.setText(todo.text)
-        binding.spinnerImportance.setSelection(todo.importance.ordinal)
+//        val todo = getTodoByIdUseCase.execute(id)
+//        binding.etTodoText.setText(todo.text)
+//        binding.spinnerImportance.setSelection(todo.importance.ordinal)
     }
 }

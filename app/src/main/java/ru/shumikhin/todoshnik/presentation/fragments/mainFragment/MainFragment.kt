@@ -26,6 +26,7 @@ import ru.shumikhin.todoshnik.domain.model.TodoItem
 import ru.shumikhin.todoshnik.domain.useCase.GetTodoListUseCase
 import ru.shumikhin.todoshnik.presentation.fragments.mainFragment.adapter.TodoAdapter
 import ru.shumikhin.todoshnik.presentation.fragments.todoInfoFragment.TodoInfoFragment
+import ru.shumikhin.todoshnik.presentation.fragments.todoInfoFragment.TodoInfoFragmentDirections
 
 
 class MainFragment : Fragment(), TodoAdapter.TodoRecyclerEvent {
@@ -38,8 +39,6 @@ class MainFragment : Fragment(), TodoAdapter.TodoRecyclerEvent {
         requireActivity().application as TodoApplication
     ) }
 
-    private lateinit var dataList: List<TodoItem>
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -47,7 +46,7 @@ class MainFragment : Fragment(), TodoAdapter.TodoRecyclerEvent {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
 
         binding.fabAddTodo.setOnClickListener{
-            findNavController().navigate(R.id.action_mainFragment_to_todoInfoFragment)
+            mainViewModel.onAddBtnClicked()
         }
 
         return binding.root
@@ -64,12 +63,30 @@ class MainFragment : Fragment(), TodoAdapter.TodoRecyclerEvent {
                 }
             }
         }
-
-
-//        todoAdapter.todoList = dataList
         val recyclerView = binding.todoRecycler
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = todoAdapter
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED){
+                mainViewModel.tasksEvent.collect{ event ->
+                    when(event){
+                        is MainFragmentViewModel.TasksEvent.NavigateToAddTaskScreen -> {
+                            Log.d("NAV-EVENT", "ADD SCREEN")
+                            val action = MainFragmentDirections.actionMainFragmentToTodoInfoFragment(todoId = null)
+                            findNavController().navigate(action)
+                        }
+                        is MainFragmentViewModel.TasksEvent.NavigateToEditTaskScreen -> {
+                            Log.d("NAV-EVENT", "EDIT SCREEN")
+                            val todoId = event.id
+                            val action = MainFragmentDirections.actionMainFragmentToTodoInfoFragment(todoId)
+                            findNavController().navigate(action)
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     override fun onDestroyView() {
@@ -78,9 +95,10 @@ class MainFragment : Fragment(), TodoAdapter.TodoRecyclerEvent {
     }
 
     override fun onItemClick(position: Int) {
-        val todo = dataList[position]
-        Toast.makeText(requireContext(), todo.importance.toString(), Toast.LENGTH_SHORT).show()
-        val bundle = bundleOf("todo_id" to todo.id.toString())
-        findNavController().navigate(R.id.action_mainFragment_to_todoInfoFragment, bundle)
+        mainViewModel.onTaskClicked(position)
+    }
+
+    override fun onCheckBoxClick(position: Int, isChecked: Boolean) {
+        mainViewModel.onTaskCompletedChanged(position, isChecked)
     }
 }

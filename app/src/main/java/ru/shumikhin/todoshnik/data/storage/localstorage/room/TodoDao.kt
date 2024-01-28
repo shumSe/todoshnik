@@ -14,14 +14,14 @@ interface TodoDao {
     fun getAll(): Flow<List<TodoItemDb>>
 
     @Query("SELECT * FROM todoitemdb WHERE id=:id")
-    fun getById(id : String): TodoItemDb
+    suspend fun getById(id : String): TodoItemDb
 
     @Insert
-    fun addTodo(todo: TodoItemDb)
+    suspend fun addTodo(todo: TodoItemDb)
 
     @Update
-    fun updateTodo(todo: TodoItemDb)
+    suspend fun updateTodo(todo: TodoItemDb)
 
     @Delete
-    fun deleteTodo(todo: TodoItemDb)
+    suspend  fun deleteTodo(todo: TodoItemDb)
 }
