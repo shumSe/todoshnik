@@ -24,6 +24,8 @@ class TodoInfoFragment : Fragment() {
     private var _binding: FragmentTodoInfoBinding? = null
     private val binding get() = _binding!!
 
+    private val todoId = arguments?.getString("todo_id")
+
     private val todoItemRepository by lazy{
         (requireActivity().application as TodoApplication).repository
     }
@@ -41,8 +43,6 @@ class TodoInfoFragment : Fragment() {
         aa.setDropDownViewResource(R.layout.spinner_importance_dropdown_item)
         val spinner = binding.spinnerImportance
         spinner.adapter = aa
-
-        val todoId = arguments?.getString("todo_id")
 
         if(todoId == null) {
             spinner.setSelection(Importance.BASIC.ordinal)

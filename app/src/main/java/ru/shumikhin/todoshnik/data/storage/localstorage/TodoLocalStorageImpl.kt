@@ -1,5 +1,8 @@
 package ru.shumikhin.todoshnik.data.storage.localstorage
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import ru.shumikhin.todoshnik.data.model.TodoItemStorage
 import ru.shumikhin.todoshnik.data.storage.TodoStorage
 import ru.shumikhin.todoshnik.data.storage.localstorage.room.TodoDao
@@ -10,8 +13,8 @@ class TodoLocalStorageImpl(
     private val todoConverter: TodoConverter
 ): TodoStorage {
 
-    override fun getTodoList(): List<TodoItemStorage> {
-        val res = todoDao.getAll().map { todoConverter.roomToRepository(it) }
+    override fun getTodoList(): Flow<List<TodoItemStorage>> {
+        val res = todoDao.getAll().map { it.map{todoConverter.roomToRepository(it)} }
         return res
     }
 
