@@ -13,4 +13,6 @@ interface TodoStorage {
 
     suspend fun updateTodo(todo: TodoItemStorage)
 
+    suspend fun deleteTodo(todo: TodoItemStorage)
+
 }

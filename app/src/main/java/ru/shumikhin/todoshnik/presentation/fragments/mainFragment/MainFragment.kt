@@ -72,12 +72,10 @@ class MainFragment : Fragment(), TodoAdapter.TodoRecyclerEvent {
                 mainViewModel.tasksEvent.collect{ event ->
                     when(event){
                         is MainFragmentViewModel.TasksEvent.NavigateToAddTaskScreen -> {
-                            Log.d("NAV-EVENT", "ADD SCREEN")
                             val action = MainFragmentDirections.actionMainFragmentToTodoInfoFragment(todoId = null)
                             findNavController().navigate(action)
                         }
                         is MainFragmentViewModel.TasksEvent.NavigateToEditTaskScreen -> {
-                            Log.d("NAV-EVENT", "EDIT SCREEN")
                             val todoId = event.id
                             val action = MainFragmentDirections.actionMainFragmentToTodoInfoFragment(todoId)
                             findNavController().navigate(action)

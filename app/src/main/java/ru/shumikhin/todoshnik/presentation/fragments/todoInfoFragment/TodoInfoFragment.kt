@@ -1,23 +1,27 @@
 package ru.shumikhin.todoshnik.presentation.fragments.todoInfoFragment
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
-import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import kotlinx.coroutines.launch
 import ru.shumikhin.todoshnik.R
 import ru.shumikhin.todoshnik.TodoApplication
 import ru.shumikhin.todoshnik.databinding.FragmentTodoInfoBinding
 import ru.shumikhin.todoshnik.domain.model.TodoItem
-import ru.shumikhin.todoshnik.domain.useCase.AddTodoUseCase
-import ru.shumikhin.todoshnik.domain.useCase.GetTodoByIdUseCase
 import ru.shumikhin.todoshnik.utils.Importance
-import java.util.Date
-import java.util.UUID
 
 
 class TodoInfoFragment : Fragment() {
@@ -25,17 +29,15 @@ class TodoInfoFragment : Fragment() {
     private var _binding: FragmentTodoInfoBinding? = null
     private val binding get() = _binding!!
 
-    private val todoId = arguments?.getString("todo_id")
-
-    private val todoItemRepository by lazy{
-        (requireActivity().application as TodoApplication).repository
-    }
-
     private val args: TodoInfoFragmentArgs by navArgs()
 
-    private val addTodoUseCase by lazy {  AddTodoUseCase(todoItemRepository = todoItemRepository) }
+    private val todoInfoViewModel: TodoInfoViewModel by viewModels {
+        TodoInfoViewModelFactory(
+            requireActivity().application as TodoApplication,
+            args.todoId
+        )
+    }
 
-    private val getTodoByIdUseCase by lazy { GetTodoByIdUseCase(todoItemRepository = todoItemRepository) }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -46,12 +48,42 @@ class TodoInfoFragment : Fragment() {
         aa.setDropDownViewResource(R.layout.spinner_importance_dropdown_item)
         val spinner = binding.spinnerImportance
         spinner.adapter = aa
+        spinner.setSelection(Importance.BASIC.ordinal)
+        setListeners()
 
-        if(todoId == null) {
-            spinner.setSelection(Importance.BASIC.ordinal)
-        }
-        else {
-            setViewsData(todoId)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+                launch {
+                    todoInfoViewModel.todo.collect { todoItem ->
+                        setViewsData(todoItem)
+                    }
+                }
+
+                launch {
+                    todoInfoViewModel.isAddMode.collect {deleteDisabled ->
+                        binding.btnDeleteTodo.isEnabled = deleteDisabled
+                        binding.btnDeleteTodo.isClickable = !deleteDisabled
+                        if(deleteDisabled){
+                            binding.btnDeleteTodo.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.label_disable))
+                            binding.btnDeleteTodo.setTextColor(ContextCompat.getColor(requireContext(), R.color.label_disable))
+                            binding.btnDeleteTodo.setIconTintResource(R.color.label_disable)
+                        }else{
+                            binding.btnDeleteTodo.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red))
+                            binding.btnDeleteTodo.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+                            binding.btnDeleteTodo.setIconTintResource(R.color.red)
+                        }
+                    }
+                }
+
+                launch {
+                    todoInfoViewModel.isAddBtnEnabled.collect{isBtnEnabled ->
+                        binding.btnSaveTodo.isEnabled = isBtnEnabled
+                        binding.btnSaveTodo.isClickable = isBtnEnabled
+                        if(isBtnEnabled) binding.btnSaveTodo.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue))
+                        else binding.btnSaveTodo.setTextColor(ContextCompat.getColor(requireContext(), R.color.label_disable))
+                    }
+                }
+            }
         }
 
         return binding.root
@@ -59,12 +91,19 @@ class TodoInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.btnSaveTodo.setOnClickListener {
-            val todo = buildTodo()
-//            addTodoUseCase.execute(todo)
-            Toast.makeText(requireContext(), "TODO ADDED", Toast.LENGTH_SHORT).show()
-            findNavController().navigate(R.id.action_todoInfoFragment_to_mainFragment)
+
+        viewLifecycleOwner.lifecycleScope.launch{
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+                todoInfoViewModel.navEvents.collect{event ->
+                    when(event){
+                        is TodoInfoViewModel.NavEvent.NavigateToMainScreen -> {
+                            findNavController().popBackStack()
+                        }
+                    }
+                }
+            }
         }
+
     }
 
     override fun onDestroyView() {
@@ -72,30 +111,36 @@ class TodoInfoFragment : Fragment() {
         _binding = null
     }
 
-    private fun buildTodo(): TodoItem {
-        val d = Date()
-        val id = UUID.randomUUID()
-        val text = binding.etTodoText.text.toString()
-        val importance = Importance.entries[binding.spinnerImportance.selectedItemPosition]
-        val deadline = null
-        val isCompleted = false
-        val createdAt = d
-        val changedAt = d
-
-        return TodoItem(
-            id,
-            text,
-            importance,
-            deadline,
-            isCompleted,
-            createdAt,
-            changedAt
-        )
+    private fun setViewsData(todo: TodoItem){
+        if(todo.text.isEmpty()){
+            return
+        }
+        binding.etTodoText.setText(todo.text)
+        binding.spinnerImportance.setSelection(todo.importance.ordinal)
     }
 
-    private fun setViewsData(id: String){
-//        val todo = getTodoByIdUseCase.execute(id)
-//        binding.etTodoText.setText(todo.text)
-//        binding.spinnerImportance.setSelection(todo.importance.ordinal)
+    private fun setListeners(){
+        binding.etTodoText.addTextChangedListener {
+            todoInfoViewModel.updateTodoText(it.toString())
+        }
+
+        binding.btnSaveTodo.setOnClickListener {
+            todoInfoViewModel.onAddBtnClick()
+        }
+
+        binding.btnDeleteTodo.setOnClickListener {
+            todoInfoViewModel.onDeleteBtnClick()
+        }
+
+        binding.spinnerImportance.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                todoInfoViewModel.updateImportance(Importance.entries[p2])
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+
+            }
+
+        }
     }
 }

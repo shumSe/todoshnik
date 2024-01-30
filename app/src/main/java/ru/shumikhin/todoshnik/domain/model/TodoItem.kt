@@ -6,11 +6,11 @@ import java.util.Date
 import java.util.UUID
 
 data class TodoItem(
-    val id: UUID,
-    val text: String,
-    var importance: Importance,
-    var deadline: Date?,
-    var isCompleted: Boolean,
-    val createdAt: Date,
-    var changedAt: Date,
+    val id: UUID = UUID.randomUUID(),
+    var text: String = "",
+    var importance: Importance = Importance.BASIC,
+    var deadline: Date? = null,
+    var isCompleted: Boolean = false,
+    val createdAt: Date = Date(),
+    var changedAt: Date = Date(),
 )

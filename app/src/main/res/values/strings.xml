@@ -17,6 +17,7 @@ Faucibus et molestie ac feugiat sed lectus vestibulum. Mattis nunc sed blandit l
     <string name="do_until">Сделать до</string>
     <string name="delete">Удалить</string>
     <string name="save">Сохранить</string>
+    <string name="todo_placeholder">Что надо сделать...</string>
 
 
     <string-array name="importance_entries">

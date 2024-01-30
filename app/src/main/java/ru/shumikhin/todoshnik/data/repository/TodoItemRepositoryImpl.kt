@@ -29,4 +29,9 @@ class TodoItemRepositoryImpl(private val todoLocalStorage: TodoStorage) : TodoIt
         val todoRepo = todoConverter.domainToRepository(todo)
         todoLocalStorage.updateTodo(todoRepo)
     }
+
+    override suspend fun deleteTodo(todo: TodoItem) {
+        val todoRepo = todoConverter.domainToRepository(todo)
+        todoLocalStorage.deleteTodo(todoRepo)
+    }
 }

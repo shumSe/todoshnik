@@ -36,4 +36,9 @@ class TodoLocalStorageImpl(
         val todoDb = todoConverter.repositoryToRoom(todo)
         todoDao.updateTodo(todoDb)
     }
+
+    override suspend fun deleteTodo(todo: TodoItemStorage) {
+        val todoDb = todoConverter.repositoryToRoom(todo)
+        todoDao.deleteTodo(todoDb)
+    }
 }
