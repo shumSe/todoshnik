@@ -5,10 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import ru.shumikhin.todoshnik.domain.model.TodoItem
 import ru.shumikhin.todoshnik.domain.useCase.AddTodoUseCase
@@ -16,6 +14,8 @@ import ru.shumikhin.todoshnik.domain.useCase.DeleteTodoUseCase
 import ru.shumikhin.todoshnik.domain.useCase.GetTodoByIdUseCase
 import ru.shumikhin.todoshnik.domain.useCase.UpdateTodoUseCase
 import ru.shumikhin.todoshnik.utils.Importance
+import java.util.Date
+import kotlin.math.log
 
 class TodoInfoViewModel(
     private val getTodoByIdUseCase: GetTodoByIdUseCase,
@@ -25,7 +25,7 @@ class TodoInfoViewModel(
     private val todoId: String?
 ): ViewModel() {
 
-    private var _todo = MutableStateFlow<TodoItem>(TodoItem())
+    private val _todo = MutableStateFlow<TodoItem>(TodoItem())
     val todo = _todo.asStateFlow()
 
     private var oldTodo: TodoItem = _todo.value.copy()
@@ -52,27 +52,46 @@ class TodoInfoViewModel(
             }
         }
     }
+
     fun updateTodoText(text: String){
         _todo.value.text = text
         validate()
     }
 
     fun updateImportance(i: Importance){
-        _todo.value.importance = i
+        viewModelScope.launch{
+            _todo.emit(
+                _todo.value.copy(importance = i)
+            )
+        }
+    }
+    fun updateDeadline(d: Long?){
+        viewModelScope.launch {
+            _todo.emit(_todo.value.copy(deadline = d))
+        }
+
     }
 
-    fun onAddBtnClick(){
+    fun onSaveBtnClick(){
         viewModelScope.launch {
             _isAddTodoMode.collect{flag ->
                 if(flag){
                     addTodoUseCase.execute(_todo.value)
                 } else {
-                    updateTodoUseCase.execute(_todo.value)
+                    updateTodoUseCase.execute(_todo.value.copy(changedAt = Date().time))
                 }
                 _navEvents.emit(
                     NavEvent.NavigateToMainScreen
                 )
             }
+        }
+    }
+
+    fun onCancelBtnClick(){
+        viewModelScope.launch {
+            _navEvents.emit(
+                NavEvent.NavigateToMainScreen
+            )
         }
     }
 
@@ -85,8 +104,8 @@ class TodoInfoViewModel(
         }
     }
 
-    private fun validate(){
-        if(_todo.value.text.isEmpty()){
+    fun validate(){
+        if(_todo.value.text.trim().isEmpty()){
             isAddBtnEnabled.value = false
             return
         }

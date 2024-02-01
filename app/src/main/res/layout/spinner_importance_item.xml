@@ -5,6 +5,5 @@
     android:layout_height="wrap_content"
     android:singleLine="true"
     android:textAppearance="@style/Subhead"
-    android:textColor="@color/red"
     />
 

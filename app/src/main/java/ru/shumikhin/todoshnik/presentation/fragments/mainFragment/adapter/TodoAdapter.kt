@@ -18,8 +18,6 @@ class TodoAdapter(
             notifyDataSetChanged()
         }
 
-    private val dateConverter = DateConverter()
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = TodoListItemBinding.inflate(inflater, parent, false)
@@ -36,7 +34,7 @@ class TodoAdapter(
                 tvTodoDeadline.visibility = View.GONE
             } else {
                 tvTodoDeadline.visibility = View.VISIBLE
-                tvTodoDeadline.text = dateConverter.dateToString(todo.deadline!!)
+                tvTodoDeadline.text = DateConverter.timestampToString(todo.deadline!!)
             }
             checkboxIsCompleted.isChecked = todo.isCompleted
         }

@@ -4,30 +4,25 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class DateConverter {
+object DateConverter {
 
     private val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
-    fun stringToDate(str: String): Date {
+    private fun stringToDate(str: String): Date {
         val res = formatter.parse(str)
         return res
     }
 
-    fun dateToString(date: Date): String{
+    private fun dateToString(date: Date): String{
         return formatter.format(date)
     }
 
-    fun stringToTimestamp(str: String): Long{
-        val date = formatter.parse(str)
-        return date.time
-    }
-
-    fun timestampToDate(time: Long): Date {
-        val date = formatter.format(time * 1000L)
+    private fun timestampToDate(time: Long): Date {
+        val date = formatter.format(time)
         return stringToDate(date)
     }
 
-    fun dateToTimestamp(date: Date): Long{
-        return stringToTimestamp(dateToString(date))
+    fun timestampToString(time: Long): String{
+        return dateToString(timestampToDate(time))
     }
 }

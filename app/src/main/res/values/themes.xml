@@ -6,6 +6,7 @@
         <item name="android:colorPrimaryDark">@color/back_primary</item>
         <item name="android:textColorPrimary">@color/label_primary</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="android:datePickerDialogTheme">@style/MyDialogTheme</item>
     </style>
 
     <style name="Theme.Todoshnik" parent="Base.Theme.Todoshnik" />

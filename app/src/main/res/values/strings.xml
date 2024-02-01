@@ -19,6 +19,10 @@ Faucibus et molestie ac feugiat sed lectus vestibulum. Mattis nunc sed blandit l
     <string name="save">Сохранить</string>
     <string name="todo_placeholder">Что надо сделать...</string>
 
+    <string name="importance_low">Низкий</string>
+    <string name="importance_basic">Нет</string>
+    <string name="importance_high">Высокий</string>
+
 
     <string-array name="importance_entries">
         <item>Нет</item>

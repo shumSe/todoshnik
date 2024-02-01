@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
-import android.widget.ArrayAdapter
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
@@ -21,6 +20,9 @@ import ru.shumikhin.todoshnik.R
 import ru.shumikhin.todoshnik.TodoApplication
 import ru.shumikhin.todoshnik.databinding.FragmentTodoInfoBinding
 import ru.shumikhin.todoshnik.domain.model.TodoItem
+import ru.shumikhin.todoshnik.presentation.fragments.datePickerFragment.DatePickerFragment
+import ru.shumikhin.todoshnik.presentation.fragments.todoInfoFragment.adapter.ImportanceSpinnerAdapter
+import ru.shumikhin.todoshnik.utils.DateConverter
 import ru.shumikhin.todoshnik.utils.Importance
 
 
@@ -44,10 +46,10 @@ class TodoInfoFragment : Fragment() {
     ): View? {
         _binding = FragmentTodoInfoBinding.inflate(inflater, container, false)
 
-        val aa = ArrayAdapter.createFromResource(requireContext(), R.array.importance_entries, R.layout.spinner_importance_item)
-        aa.setDropDownViewResource(R.layout.spinner_importance_dropdown_item)
+        val spinnerAdapter = ImportanceSpinnerAdapter(requireContext(), Importance.entries.toList())
+
         val spinner = binding.spinnerImportance
-        spinner.adapter = aa
+        spinner.adapter = spinnerAdapter
         spinner.setSelection(Importance.BASIC.ordinal)
         setListeners()
 
@@ -56,12 +58,13 @@ class TodoInfoFragment : Fragment() {
                 launch {
                     todoInfoViewModel.todo.collect { todoItem ->
                         setViewsData(todoItem)
+                        todoInfoViewModel.validate()
                     }
                 }
 
                 launch {
                     todoInfoViewModel.isAddMode.collect {deleteDisabled ->
-                        binding.btnDeleteTodo.isEnabled = deleteDisabled
+                        binding.btnDeleteTodo.isEnabled = !deleteDisabled
                         binding.btnDeleteTodo.isClickable = !deleteDisabled
                         if(deleteDisabled){
                             binding.btnDeleteTodo.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.label_disable))
@@ -97,7 +100,7 @@ class TodoInfoFragment : Fragment() {
                 todoInfoViewModel.navEvents.collect{event ->
                     when(event){
                         is TodoInfoViewModel.NavEvent.NavigateToMainScreen -> {
-                            findNavController().popBackStack()
+                            findNavController().navigate(R.id.action_todoInfoFragment_to_mainFragment)
                         }
                     }
                 }
@@ -112,24 +115,57 @@ class TodoInfoFragment : Fragment() {
     }
 
     private fun setViewsData(todo: TodoItem){
-        if(todo.text.isEmpty()){
-            return
-        }
         binding.etTodoText.setText(todo.text)
         binding.spinnerImportance.setSelection(todo.importance.ordinal)
+        todo.deadline?.let {
+            binding.tvInfoDeadline.text = DateConverter.timestampToString(it)
+            binding.tvInfoDeadline.visibility = View.VISIBLE
+            binding.switchDeadline.isChecked = true
+        }
+
     }
 
-    private fun setListeners(){
+    private  fun setListeners(){
+
         binding.etTodoText.addTextChangedListener {
-            todoInfoViewModel.updateTodoText(it.toString())
+            todoInfoViewModel.updateTodoText(it.toString().trim())
         }
 
         binding.btnSaveTodo.setOnClickListener {
-            todoInfoViewModel.onAddBtnClick()
+            todoInfoViewModel.onSaveBtnClick()
         }
 
         binding.btnDeleteTodo.setOnClickListener {
             todoInfoViewModel.onDeleteBtnClick()
+        }
+
+        binding.btnCancel.setOnClickListener{
+            todoInfoViewModel.onCancelBtnClick()
+        }
+
+        binding.tvDoUntil.setOnClickListener {
+            showDatePicker()
+            binding.etTodoText.isCursorVisible = false
+        }
+
+        binding.tvInfoDeadline.setOnClickListener {
+            showDatePicker()
+        }
+
+        binding.root.setOnClickListener{
+            binding.etTodoText.isCursorVisible = false
+        }
+
+        binding.switchDeadline.setOnCheckedChangeListener{ buttonView, isChecked ->
+            if(isChecked){
+                if(todoInfoViewModel.todo.value.deadline != null){
+                    return@setOnCheckedChangeListener
+                }
+                showDatePicker()
+            } else {
+                binding.tvInfoDeadline.visibility = View.GONE
+                todoInfoViewModel.updateDeadline(null)
+            }
         }
 
         binding.spinnerImportance.onItemSelectedListener = object : OnItemSelectedListener {
@@ -142,5 +178,36 @@ class TodoInfoFragment : Fragment() {
             }
 
         }
+    }
+
+    private fun showDatePicker(){
+        val todoDeadline = if(todoInfoViewModel.todo.value.deadline != null) todoInfoViewModel.todo.value.deadline else DATE_PICKER_EMPTY
+        val datePicker = DatePickerFragment(todoDeadline!!)
+        val fragManager = requireActivity().supportFragmentManager
+        fragManager.setFragmentResultListener(
+            "REQUEST_KEY",
+            viewLifecycleOwner
+        ){
+                resultKey, bundle ->
+            if(resultKey == "REQUEST_KEY"){
+                val date = bundle.getLong("SELECTED_DATE")
+                if (date == DATE_PICKER_EMPTY){
+                    binding.switchDeadline.isChecked = false
+                    todoInfoViewModel.updateDeadline(null)
+                    return@setFragmentResultListener
+                }
+                val stringDeadline = DateConverter.timestampToString(date)
+                binding.tvInfoDeadline.text = stringDeadline
+                binding.tvInfoDeadline.visibility = View.VISIBLE
+                todoInfoViewModel.updateDeadline(date)
+            }
+
+        }
+
+        datePicker.show(fragManager, "datePicker")
+    }
+
+    companion object {
+        const val DATE_PICKER_EMPTY: Long = 0
     }
 }

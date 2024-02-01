@@ -18,10 +18,12 @@
             android:background="@color/back_primary"
             android:minHeight="?actionBarSize"
             >
+
             <ImageView
+                android:id="@+id/btn_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/close"/>
+                android:src="@drawable/close" />
 
             <Button
                 android:id="@+id/btn_save_todo"
@@ -47,7 +49,6 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-
             >
 
             <EditText
@@ -80,7 +81,7 @@
 
             <Spinner
                 android:id="@+id/spinner_importance"
-                android:layout_width="wrap_content"
+                android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="4dp"
@@ -88,7 +89,6 @@
                 android:tooltipText="text"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_importance"
-
                 />
 
             <View
@@ -117,14 +117,16 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="4dp"
-                android:visibility="visible"
+                android:visibility="gone"
+                android:textColor="@color/blue"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tv_do_until" />
 
-            <com.google.android.material.switchmaterial.SwitchMaterial
+            <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/switch_deadline"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:theme="@style/CustomSwitch"
                 android:layout_marginHorizontal="16dp"
                 app:layout_constraintBottom_toBottomOf="@id/tv_info_deadline"
                 app:layout_constraintEnd_toEndOf="parent"

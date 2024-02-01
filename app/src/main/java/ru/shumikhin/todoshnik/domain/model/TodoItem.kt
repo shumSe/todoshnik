@@ -9,8 +9,8 @@ data class TodoItem(
     val id: UUID = UUID.randomUUID(),
     var text: String = "",
     var importance: Importance = Importance.BASIC,
-    var deadline: Date? = null,
+    var deadline: Long? = null,
     var isCompleted: Boolean = false,
-    val createdAt: Date = Date(),
-    var changedAt: Date = Date(),
+    val createdAt: Long = Date().time,
+    var changedAt: Long = Date().time,
 )
