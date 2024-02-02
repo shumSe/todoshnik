@@ -40,6 +40,7 @@
                 />
 
             <TextView
+                android:id="@+id/tv_completed_count"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|start"
@@ -82,10 +83,15 @@
         android:id="@+id/fab_add_todo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginBottom="20dp"
         android:clickable="true"
         android:src="@android:drawable/ic_input_add"
         android:layout_gravity="bottom|end"
+        app:tint="@color/white"
+        android:backgroundTint="@color/blue"
+        app:shapeAppearance="@drawable/fab_background"
+        app:elevation="6dp"
+        app:borderWidth="0dp"
     />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

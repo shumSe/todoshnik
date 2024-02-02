@@ -5,7 +5,7 @@ import ru.shumikhin.todoshnik.data.storage.localstorage.room.model.TodoItemDb
 import ru.shumikhin.todoshnik.domain.model.TodoItem
 import java.util.UUID
 
-class TodoConverter {
+object TodoConverter {
 
     fun domainToRepository(item: TodoItem): TodoItemStorage {
         val result = TodoItemStorage(

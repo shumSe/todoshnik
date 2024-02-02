@@ -75,5 +75,13 @@
         <item name="android:colorControlHighlight">@color/back_primary</item>
     </style>
 
+    <style name="MyCustomFab" parent="">
 
+        <!--for the extended FAB the cornerFamily is given the value as the cut-->
+        <item name="colorSecondary">@color/blue</item>
+
+        <!--this attribute gives makes the change in the text and icon color of the FAB-->
+        <item name="colorOnSecondary">@color/white</item>
+
+    </style>
 </resources>

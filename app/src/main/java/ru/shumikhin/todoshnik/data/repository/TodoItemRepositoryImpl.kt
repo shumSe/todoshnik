@@ -6,10 +6,11 @@ import ru.shumikhin.todoshnik.data.storage.TodoStorage
 import ru.shumikhin.todoshnik.domain.model.TodoItem
 import ru.shumikhin.todoshnik.domain.repository.TodoItemRepository
 import ru.shumikhin.todoshnik.utils.TodoConverter
+import javax.inject.Inject
 
-class TodoItemRepositoryImpl(private val todoLocalStorage: TodoStorage) : TodoItemRepository {
+class TodoItemRepositoryImpl @Inject constructor(private val todoLocalStorage: TodoStorage) : TodoItemRepository {
 
-    private val todoConverter = TodoConverter()
+    private val todoConverter = TodoConverter
 
     override fun getTodoList(): Flow<List<TodoItem>> {
         return todoLocalStorage.getTodoList()

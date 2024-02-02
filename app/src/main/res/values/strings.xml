@@ -12,7 +12,7 @@ Aliquam purus sit amet luctus venenatis lectus magna fringilla. Etiam dignissim 
 
 Faucibus et molestie ac feugiat sed lectus vestibulum. Mattis nunc sed blandit libero volutpat sed cras. Sed augue lacus viverra vitae congue. Pharetra sit amet aliquam id diam maecenas ultricies. Metus dictum at tempor commodo ullamcorper a. Viverra aliquet eget sit amet tellus. Odio ut sem nulla pharetra diam sit amet nisl suscipit. Tincidunt vitae semper quis lectus nulla at volutpat diam. Dolor sed viverra ipsum nunc. Phasellus faucibus scelerisque eleifend donec pretium vulputate. Id eu nisl nunc mi. Ut eu sem integer vitae justo eget magna. Nisl purus in mollis nunc sed id semper. Velit ut tortor pretium viverra. Ut consequat semper viverra nam libero.</string>
     <string name="my_tasks">Мои дела</string>
-    <string name="completed">Выполнено -</string>
+    <string name="completed">Выполнено - %d</string>
     <string name="importance">Важность</string>
     <string name="do_until">Сделать до</string>
     <string name="delete">Удалить</string>

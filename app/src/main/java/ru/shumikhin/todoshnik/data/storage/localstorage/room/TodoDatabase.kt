@@ -10,28 +10,4 @@ import ru.shumikhin.todoshnik.data.storage.localstorage.room.model.TodoItemDb
 abstract class TodoDatabase : RoomDatabase() {
     abstract fun todoDao(): TodoDao
 
-    companion object {
-        // Singleton prevents multiple instances of database opening at the
-        // same time.
-        @Volatile
-        private var INSTANCE: TodoDatabase? = null
-
-        fun getDatabase(context: Context): TodoDatabase {
-            // if the INSTANCE is not null, then return it,
-            // if it is, then create the database
-            return INSTANCE ?: synchronized(this) {
-                val instance = Room.databaseBuilder(
-                    context.applicationContext,
-                    TodoDatabase::class.java,
-                    "todo_database"
-                )
-                    .allowMainThreadQueries()
-                    .build()
-                INSTANCE = instance
-                // return instance
-                instance
-            }
-        }
-    }
-
 }

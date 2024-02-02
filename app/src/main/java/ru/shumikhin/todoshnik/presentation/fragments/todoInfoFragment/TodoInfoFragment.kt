@@ -11,6 +11,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
@@ -20,10 +21,12 @@ import ru.shumikhin.todoshnik.R
 import ru.shumikhin.todoshnik.TodoApplication
 import ru.shumikhin.todoshnik.databinding.FragmentTodoInfoBinding
 import ru.shumikhin.todoshnik.domain.model.TodoItem
+import ru.shumikhin.todoshnik.presentation.MainActivity
 import ru.shumikhin.todoshnik.presentation.fragments.datePickerFragment.DatePickerFragment
 import ru.shumikhin.todoshnik.presentation.fragments.todoInfoFragment.adapter.ImportanceSpinnerAdapter
 import ru.shumikhin.todoshnik.utils.DateConverter
 import ru.shumikhin.todoshnik.utils.Importance
+import javax.inject.Inject
 
 
 class TodoInfoFragment : Fragment() {
@@ -33,12 +36,10 @@ class TodoInfoFragment : Fragment() {
 
     private val args: TodoInfoFragmentArgs by navArgs()
 
-    private val todoInfoViewModel: TodoInfoViewModel by viewModels {
-        TodoInfoViewModelFactory(
-            requireActivity().application as TodoApplication,
-            args.todoId
-        )
-    }
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+
+    private val todoInfoViewModel: TodoInfoViewModel by viewModels { viewModelFactory }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,15 +47,21 @@ class TodoInfoFragment : Fragment() {
     ): View? {
         _binding = FragmentTodoInfoBinding.inflate(inflater, container, false)
 
+        (requireActivity() as MainActivity).activityComponent.todoInfoFragmentComponentFactory()
+            .create().inject(this)
+
+
         val spinnerAdapter = ImportanceSpinnerAdapter(requireContext(), Importance.entries.toList())
 
         val spinner = binding.spinnerImportance
         spinner.adapter = spinnerAdapter
         spinner.setSelection(Importance.BASIC.ordinal)
+
+        loadArgs()
         setListeners()
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     todoInfoViewModel.todo.collect { todoItem ->
                         setViewsData(todoItem)
@@ -63,27 +70,57 @@ class TodoInfoFragment : Fragment() {
                 }
 
                 launch {
-                    todoInfoViewModel.isAddMode.collect {deleteDisabled ->
+                    todoInfoViewModel.isAddMode.collect { deleteDisabled ->
                         binding.btnDeleteTodo.isEnabled = !deleteDisabled
                         binding.btnDeleteTodo.isClickable = !deleteDisabled
-                        if(deleteDisabled){
-                            binding.btnDeleteTodo.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.label_disable))
-                            binding.btnDeleteTodo.setTextColor(ContextCompat.getColor(requireContext(), R.color.label_disable))
+                        if (deleteDisabled) {
+                            binding.btnDeleteTodo.setBackgroundColor(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    R.color.label_disable
+                                )
+                            )
+                            binding.btnDeleteTodo.setTextColor(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    R.color.label_disable
+                                )
+                            )
                             binding.btnDeleteTodo.setIconTintResource(R.color.label_disable)
-                        }else{
-                            binding.btnDeleteTodo.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.red))
-                            binding.btnDeleteTodo.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+                        } else {
+                            binding.btnDeleteTodo.setBackgroundColor(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    R.color.red
+                                )
+                            )
+                            binding.btnDeleteTodo.setTextColor(
+                                ContextCompat.getColor(
+                                    requireContext(),
+                                    R.color.red
+                                )
+                            )
                             binding.btnDeleteTodo.setIconTintResource(R.color.red)
                         }
                     }
                 }
 
                 launch {
-                    todoInfoViewModel.isAddBtnEnabled.collect{isBtnEnabled ->
+                    todoInfoViewModel.isAddBtnEnabled.collect { isBtnEnabled ->
                         binding.btnSaveTodo.isEnabled = isBtnEnabled
                         binding.btnSaveTodo.isClickable = isBtnEnabled
-                        if(isBtnEnabled) binding.btnSaveTodo.setTextColor(ContextCompat.getColor(requireContext(), R.color.blue))
-                        else binding.btnSaveTodo.setTextColor(ContextCompat.getColor(requireContext(), R.color.label_disable))
+                        if (isBtnEnabled) binding.btnSaveTodo.setTextColor(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.blue
+                            )
+                        )
+                        else binding.btnSaveTodo.setTextColor(
+                            ContextCompat.getColor(
+                                requireContext(),
+                                R.color.label_disable
+                            )
+                        )
                     }
                 }
             }
@@ -95,10 +132,10 @@ class TodoInfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewLifecycleOwner.lifecycleScope.launch{
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
-                todoInfoViewModel.navEvents.collect{event ->
-                    when(event){
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                todoInfoViewModel.navEvents.collect { event ->
+                    when (event) {
                         is TodoInfoViewModel.NavEvent.NavigateToMainScreen -> {
                             findNavController().navigate(R.id.action_todoInfoFragment_to_mainFragment)
                         }
@@ -114,7 +151,7 @@ class TodoInfoFragment : Fragment() {
         _binding = null
     }
 
-    private fun setViewsData(todo: TodoItem){
+    private fun setViewsData(todo: TodoItem) {
         binding.etTodoText.setText(todo.text)
         binding.spinnerImportance.setSelection(todo.importance.ordinal)
         todo.deadline?.let {
@@ -125,7 +162,13 @@ class TodoInfoFragment : Fragment() {
 
     }
 
-    private  fun setListeners(){
+    private fun loadArgs() {
+        args.todoId?.let {
+            todoInfoViewModel.setTodoId(it)
+        }
+    }
+
+    private fun setListeners() {
 
         binding.etTodoText.addTextChangedListener {
             todoInfoViewModel.updateTodoText(it.toString().trim())
@@ -139,7 +182,7 @@ class TodoInfoFragment : Fragment() {
             todoInfoViewModel.onDeleteBtnClick()
         }
 
-        binding.btnCancel.setOnClickListener{
+        binding.btnCancel.setOnClickListener {
             todoInfoViewModel.onCancelBtnClick()
         }
 
@@ -152,13 +195,13 @@ class TodoInfoFragment : Fragment() {
             showDatePicker()
         }
 
-        binding.root.setOnClickListener{
+        binding.root.setOnClickListener {
             binding.etTodoText.isCursorVisible = false
         }
 
-        binding.switchDeadline.setOnCheckedChangeListener{ buttonView, isChecked ->
-            if(isChecked){
-                if(todoInfoViewModel.todo.value.deadline != null){
+        binding.switchDeadline.setOnCheckedChangeListener { buttonView, isChecked ->
+            if (isChecked) {
+                if (todoInfoViewModel.todo.value.deadline != null) {
                     return@setOnCheckedChangeListener
                 }
                 showDatePicker()
@@ -180,18 +223,18 @@ class TodoInfoFragment : Fragment() {
         }
     }
 
-    private fun showDatePicker(){
-        val todoDeadline = if(todoInfoViewModel.todo.value.deadline != null) todoInfoViewModel.todo.value.deadline else DATE_PICKER_EMPTY
+    private fun showDatePicker() {
+        val todoDeadline =
+            if (todoInfoViewModel.todo.value.deadline != null) todoInfoViewModel.todo.value.deadline else DATE_PICKER_EMPTY
         val datePicker = DatePickerFragment(todoDeadline!!)
         val fragManager = requireActivity().supportFragmentManager
         fragManager.setFragmentResultListener(
             "REQUEST_KEY",
             viewLifecycleOwner
-        ){
-                resultKey, bundle ->
-            if(resultKey == "REQUEST_KEY"){
+        ) { resultKey, bundle ->
+            if (resultKey == "REQUEST_KEY") {
                 val date = bundle.getLong("SELECTED_DATE")
-                if (date == DATE_PICKER_EMPTY){
+                if (date == DATE_PICKER_EMPTY) {
                     binding.switchDeadline.isChecked = false
                     todoInfoViewModel.updateDeadline(null)
                     return@setFragmentResultListener

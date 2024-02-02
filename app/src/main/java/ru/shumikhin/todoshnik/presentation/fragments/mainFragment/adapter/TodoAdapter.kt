@@ -1,15 +1,21 @@
 package ru.shumikhin.todoshnik.presentation.fragments.mainFragment.adapter
 
+import android.content.Context
+import android.graphics.Paint
+import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import ru.shumikhin.todoshnik.R
 import ru.shumikhin.todoshnik.databinding.TodoListItemBinding
 import ru.shumikhin.todoshnik.domain.model.TodoItem
 import ru.shumikhin.todoshnik.utils.DateConverter
 
 class TodoAdapter(
-    private  val listener: TodoRecyclerEvent
+    private  val listener: TodoRecyclerEvent,
+    private val context: Context
 ): RecyclerView.Adapter<TodoAdapter.TodoViewHolder>() {
 
     var todoList: List<TodoItem> = emptyList()
@@ -37,6 +43,13 @@ class TodoAdapter(
                 tvTodoDeadline.text = DateConverter.timestampToString(todo.deadline!!)
             }
             checkboxIsCompleted.isChecked = todo.isCompleted
+            if(todo.isCompleted){
+                tvTodoTitle.setTextColor(ContextCompat.getColor(context, R.color.green))
+                tvTodoTitle.paintFlags = (Paint.STRIKE_THRU_TEXT_FLAG)
+            } else{
+                tvTodoTitle.setTextColor(ContextCompat.getColor(context, R.color.label_primary))
+                tvTodoTitle.paintFlags = tvTodoDeadline.paintFlags
+            }
         }
     }
 

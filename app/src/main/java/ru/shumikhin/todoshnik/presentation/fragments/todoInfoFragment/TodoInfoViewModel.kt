@@ -1,12 +1,16 @@
 package ru.shumikhin.todoshnik.presentation.fragments.todoInfoFragment
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import ru.shumikhin.todoshnik.domain.model.TodoItem
 import ru.shumikhin.todoshnik.domain.useCase.AddTodoUseCase
@@ -15,18 +19,21 @@ import ru.shumikhin.todoshnik.domain.useCase.GetTodoByIdUseCase
 import ru.shumikhin.todoshnik.domain.useCase.UpdateTodoUseCase
 import ru.shumikhin.todoshnik.utils.Importance
 import java.util.Date
+import javax.inject.Inject
 import kotlin.math.log
 
-class TodoInfoViewModel(
+class TodoInfoViewModel @Inject constructor(
     private val getTodoByIdUseCase: GetTodoByIdUseCase,
     private val addTodoUseCase: AddTodoUseCase,
     private val updateTodoUseCase: UpdateTodoUseCase,
     private val deleteTodoUseCase: DeleteTodoUseCase,
-    private val todoId: String?
 ): ViewModel() {
 
     private val _todo = MutableStateFlow<TodoItem>(TodoItem())
     val todo = _todo.asStateFlow()
+
+    private val _todo_id = MutableStateFlow<String?>(null)
+    val todo_id = _todo_id.asStateFlow()
 
     private var oldTodo: TodoItem = _todo.value.copy()
         set(value){
@@ -35,7 +42,7 @@ class TodoInfoViewModel(
         }
 
 
-    private val _isAddTodoMode = MutableStateFlow<Boolean>(todoId == null)
+    private val _isAddTodoMode = MutableStateFlow<Boolean>(_todo_id.value == null)
     val isAddMode = _isAddTodoMode.asStateFlow()
 
     private val _navEvents = MutableSharedFlow<NavEvent>()
@@ -46,10 +53,19 @@ class TodoInfoViewModel(
 
     init {
         viewModelScope.launch {
-            todoId?.let {
-                _todo.value = getTodoByIdUseCase.execute(it)
-                oldTodo = getTodoByIdUseCase.execute(it)
+            _todo_id.collect{
+                it?.let{
+                    _todo.emit(getTodoByIdUseCase.execute(it))
+                    oldTodo = getTodoByIdUseCase.execute(it)
+                }
             }
+        }
+    }
+
+    fun setTodoId(s: String){
+        viewModelScope.launch {
+            _todo_id.emit(s)
+            _isAddTodoMode.emit(false)
         }
     }
 

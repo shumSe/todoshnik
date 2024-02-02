@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -24,9 +25,11 @@ import ru.shumikhin.todoshnik.data.repository.TodoItemRepositoryImpl
 import ru.shumikhin.todoshnik.databinding.FragmentMainBinding
 import ru.shumikhin.todoshnik.domain.model.TodoItem
 import ru.shumikhin.todoshnik.domain.useCase.GetTodoListUseCase
+import ru.shumikhin.todoshnik.presentation.MainActivity
 import ru.shumikhin.todoshnik.presentation.fragments.mainFragment.adapter.TodoAdapter
 import ru.shumikhin.todoshnik.presentation.fragments.todoInfoFragment.TodoInfoFragment
 import ru.shumikhin.todoshnik.presentation.fragments.todoInfoFragment.TodoInfoFragmentDirections
+import javax.inject.Inject
 
 
 class MainFragment : Fragment(), TodoAdapter.TodoRecyclerEvent {
@@ -34,10 +37,10 @@ class MainFragment : Fragment(), TodoAdapter.TodoRecyclerEvent {
     private var _binding: FragmentMainBinding? = null
     private val binding get() = _binding!!
 
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
 
-    private val mainViewModel: MainFragmentViewModel by viewModels { MainFragmentViewModelFactory(
-        requireActivity().application as TodoApplication
-    ) }
+    private val mainViewModel: MainFragmentViewModel by viewModels { viewModelFactory }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,8 +48,20 @@ class MainFragment : Fragment(), TodoAdapter.TodoRecyclerEvent {
     ): View? {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
 
-        binding.fabAddTodo.setOnClickListener{
+        (requireActivity() as MainActivity).activityComponent.mainFragmentComponentFactory()
+            .create().inject(this)
+
+
+        binding.fabAddTodo.setOnClickListener {
             mainViewModel.onAddBtnClicked()
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mainViewModel.completedCount.collect { complCount ->
+                    binding.tvCompletedCount.text = getString(R.string.completed, complCount)
+                }
+            }
         }
 
         return binding.root
@@ -54,11 +69,11 @@ class MainFragment : Fragment(), TodoAdapter.TodoRecyclerEvent {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val todoAdapter = TodoAdapter(this)
+        val todoAdapter = TodoAdapter(this, requireContext())
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED){
-                mainViewModel.tasks.collect{
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mainViewModel.tasks.collect {
                     todoAdapter.todoList = it
                 }
             }
@@ -68,16 +83,19 @@ class MainFragment : Fragment(), TodoAdapter.TodoRecyclerEvent {
         recyclerView.adapter = todoAdapter
 
         viewLifecycleOwner.lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED){
-                mainViewModel.tasksEvent.collect{ event ->
-                    when(event){
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mainViewModel.tasksEvent.collect { event ->
+                    when (event) {
                         is MainFragmentViewModel.TasksEvent.NavigateToAddTaskScreen -> {
-                            val action = MainFragmentDirections.actionMainFragmentToTodoInfoFragment(todoId = null)
+                            val action =
+                                MainFragmentDirections.actionMainFragmentToTodoInfoFragment(todoId = null)
                             findNavController().navigate(action)
                         }
+
                         is MainFragmentViewModel.TasksEvent.NavigateToEditTaskScreen -> {
                             val todoId = event.id
-                            val action = MainFragmentDirections.actionMainFragmentToTodoInfoFragment(todoId)
+                            val action =
+                                MainFragmentDirections.actionMainFragmentToTodoInfoFragment(todoId)
                             findNavController().navigate(action)
                         }
                     }
