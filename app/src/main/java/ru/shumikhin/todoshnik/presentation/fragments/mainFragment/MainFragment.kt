@@ -7,12 +7,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -56,10 +58,14 @@ class MainFragment : Fragment(), TodoAdapter.TodoRecyclerEvent {
             mainViewModel.onAddBtnClicked()
         }
 
+        binding.btnHideCompleted.setOnClickListener {
+            mainViewModel.onHideCompletedClicked()
+        }
+
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mainViewModel.completedCount.collect { complCount ->
-                    binding.tvCompletedCount.text = getString(R.string.completed, complCount)
+                mainViewModel.completedCount.collect { completedCount ->
+                    binding.tvCompletedCount.text = getString(R.string.completed, completedCount)
                 }
             }
         }
@@ -73,8 +79,19 @@ class MainFragment : Fragment(), TodoAdapter.TodoRecyclerEvent {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mainViewModel.tasks.collect {
-                    todoAdapter.todoList = it
+                launch {
+                    mainViewModel.tasks.collect { taskList ->
+                        todoAdapter.submitList(taskList)
+                    }
+                }
+                launch {
+                    mainViewModel.isHideCompleted.collect{flag ->
+                        if(flag){
+                            binding.btnHideCompleted.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.visibility_on))
+                        }else{
+                            binding.btnHideCompleted.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.visibility_off))
+                        }
+                    }
                 }
             }
         }

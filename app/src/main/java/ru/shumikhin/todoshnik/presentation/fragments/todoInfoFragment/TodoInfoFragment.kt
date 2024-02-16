@@ -137,7 +137,7 @@ class TodoInfoFragment : Fragment() {
                 todoInfoViewModel.navEvents.collect { event ->
                     when (event) {
                         is TodoInfoViewModel.NavEvent.NavigateToMainScreen -> {
-                            findNavController().navigate(R.id.action_todoInfoFragment_to_mainFragment)
+                            findNavController().popBackStack()
                         }
                     }
                 }

@@ -37,6 +37,7 @@
                 android:background="@color/back_primary"
                 app:titleTextAppearance="@style/Title"
                 app:layout_scrollFlags="scroll|enterAlways"
+                app:titleTextColor="@color/label_primary"
                 />
 
             <TextView
@@ -47,19 +48,20 @@
                 android:layout_marginStart="48dp"
                 android:layout_marginBottom="20dp"
                 android:text="@string/completed"
+                android:textColor="@color/label_primary"
                 app:layout_collapseMode="parallax"
                 />
 
             <ImageButton
+                android:id="@+id/btn_hide_completed"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom|end|center"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
                 android:background="@color/back_primary"
-                android:src="@drawable/visibility"
-                app:tint="@color/blue"
-                />
+                android:src="@drawable/visibility_on"
+                app:tint="@color/blue" />
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
@@ -71,13 +73,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/back_secondary"
-        android:minHeight="300dp"
-        android:overScrollMode="never"
-        app:layout_anchorGravity="center"
-        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         android:clipToPadding="false"
+        android:minHeight="200dp"
+        android:overScrollMode="never"
         android:paddingBottom="10dp"
-        />
+        app:layout_anchorGravity="center"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_todo"
